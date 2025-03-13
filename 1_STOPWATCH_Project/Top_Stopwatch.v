@@ -11,7 +11,7 @@ module top_stopwatch (
 
     output [3:0] fnd_comm,
     output [7:0] fnd_font,
-    output [1:0] led
+    output [3:0] led
 );
 
     wire w_btn_clear,w_btn_run_hour,w_btn_run,w_btn_hour,w_btn_min,w_btn_sec;
@@ -100,7 +100,7 @@ module top_stopwatch (
     );
 
     led_indicator u_led_indicator (
-        .sw(sw[0]),
+        .sw(sw),
         .clk(clk),
         .reset(reset),
         .led(led)
@@ -129,20 +129,24 @@ module top_stopwatch (
 endmodule
 
 module led_indicator (
-    input sw,reset,clk,
-    output reg [1:0] led
+    input reset,clk,
+    input [1:0]sw,
+    output reg [3:0] led
 );
     always @(posedge clk or posedge reset) begin
     if (reset) begin
-        led <= 2'b00;
+        led <= 4'b0000;
     end else begin
-        if (sw == 1) begin
-            led <= 2'b10;
-        end else begin
-            led <= 2'b01;
-        end
+        case (sw)
+            2'b00:led <= 4'b0001;
+            2'b01: led <= 4'b0010;
+            2'b10: led <= 4'b0100;
+            2'b11: led <= 4'b1000; 
+            default: led <= 4'b0000;
+        endcase
     end
 end
+
 endmodule  // ✅ end 추가
 
 
@@ -158,15 +162,15 @@ module dp_mux (
     always @(*) begin
             // sw_mode에 따라 선택
             if (sw_mode == 0) begin
-                msec <= s_msec;
-                sec  <= s_sec;
-                min  <= s_min;
-                hour <= s_hour;
+                msec = s_msec;
+                sec  = s_sec;
+                min  = s_min;
+                hour = s_hour;
             end else begin
-                msec <= c_msec;
-                sec  <= c_sec;
-                min  <= c_min;
-                hour <= c_hour;
+                msec = c_msec;
+                sec  = c_sec;
+                min  = c_min;
+                hour = c_hour;
             end
         end
 
