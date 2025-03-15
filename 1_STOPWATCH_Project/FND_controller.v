@@ -20,14 +20,14 @@ module fnd_controller (
     wire [2:0] seg_sel;
     wire o_clk,o_dot;
 
-    // ✅ 1kHz 클럭 분주기
+    //  1kHz 클럭 분주기
     clk_divider u_clk_divider (
         .clk  (clk),
         .reset(reset),
         .o_clk(o_clk)
     );
 
-    // ✅ 7-segment 선택 카운터 (0~3)
+    // 7-segment 선택 카운터 (0~3)
     counter u_counter (
         .clk(o_clk),
         .reset(reset),
@@ -92,14 +92,14 @@ module fnd_controller (
 
 
 
-    // ✅ BCD 값을 7-Segment로 변환
+    //  BCD 값을 7-Segment로 변환
     bcdtoseg u_bcdtoseg (
         .bcd(w_bcd),
         .seg(fnd_font),
         .dot_enable((seg_sel == 3'b010)& o_dot)
     );
 
-    // ✅ 활성화할 7-segment 자리 선택
+    //  활성화할 7-segment 자리 선택
     decoder_3x8 u_dec (
         .seg_sel (seg_sel),
         .seg_comm(fnd_comm)
@@ -149,14 +149,14 @@ endmodule
 module digit_splitter #(
     parameter BIT_WIDTH = 7
 ) (
-    input [BIT_WIDTH-1:0] bcd,  // ✅ 7비트 Binary 입력
-    output reg [3:0] digit_1,  // ✅ 1의 자리
-    output reg [3:0] digit_10  // ✅ 10의 자리
+    input [BIT_WIDTH-1:0] bcd,  //  7비트 Binary 입력
+    output reg [3:0] digit_1,  // 1의 자리
+    output reg [3:0] digit_10  // 10의 자리
 );
 
     always @(*) begin
-        digit_1 = bcd % 10;  // ✅ 1의 자리 (BCD의 하위 4비트)
-        digit_10 = (bcd / 10) % 10;  // ✅ 10의 자리 (BCD의 상위 4비트)
+        digit_1 = bcd % 10;  // 1의 자리 
+        digit_10 = (bcd / 10) % 10;  //  10의 자리 
     end
 endmodule
 
@@ -182,13 +182,13 @@ module mux_8x1 (
 endmodule
 
 
-// ✅ 1kHz 클럭 분주기
+//  1kHz 클럭 분주기
 module clk_divider (
     input  clk,
     input  reset,
     output o_clk
 );
-    parameter CLK_DIV = 50000; // ✅ 유지보수성을 위해 parameter 사용
+    parameter CLK_DIV = 50000; 
     reg [15:0] r_count;
     reg r_clk;
 
@@ -210,11 +210,11 @@ module clk_divider (
 endmodule
 
 
-// ✅ 7-Segment 선택을 위한 2비트 카운터
+//  7-Segment 선택을 위한 2비트 카운터
 module counter (
     input clk,
     input reset,
-    output reg [2:0] seg_sel // ✅ 2비트 → 3비트로 변경
+    output reg [2:0] seg_sel 
 );
     always @(posedge clk or posedge reset) begin
         if (reset) seg_sel <= 3'b000;
@@ -223,10 +223,10 @@ module counter (
 endmodule
 
 
-// ✅ BCD → 7-Segment 변환
+// BCD → 7-Segment 변환
 module bcdtoseg (
     input [3:0] bcd,
-    input dot_enable,  // ✅ 추가: dot(소수점) 활성화 여부
+    input dot_enable,  //  dot 활성화 여부
     output reg [7:0] seg
 );
     always @(bcd) begin
@@ -244,31 +244,32 @@ module bcdtoseg (
             default: seg = 8'hFF;  // 예외 처리
         endcase
 
-        // ✅ 소수점 비트(dot)를 제어
+        // dot 제어
         if (dot_enable==1)begin
-            seg = seg & 8'h7F;  // dot ON (7번째 비트를 0으로 설정)
+            seg = seg & 8'h7F;  // dot ON 
         end
         else begin
-            seg = seg | 8'h80;  // dot OFF (7번째 비트를 1로 설정)
+            seg = seg | 8'h80;  // dot OFF 
         end
     end
 
 endmodule
 
-module dot_enable (
+// 0.5초마다 dot 토글 발생 모듈
+module dot_enable ( 
     input clk, reset, 
-    output reg o_dot  // ✅ reg로 선언해야 함
+    output reg o_dot  
 );
-    reg [25:0] count;  // ✅ 20비트 크기 (더 큰 주기 지원 가능)
+    reg [25:0] count;  /
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             count <= 0;
-            o_dot <= 0;  // ✅ 초기화
+            o_dot <= 0;  
         end else begin
-            if (count == 49_999_999) begin  // ✅ 명확한 값 사용
+            if (count == 49_999_999) begin 
                 count <= 0;
-                o_dot <= ~o_dot;  // ✅ 바로 토글
+                o_dot <= ~o_dot;  
             end else begin
                 count <= count + 1;
             end
