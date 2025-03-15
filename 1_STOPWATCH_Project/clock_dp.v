@@ -72,21 +72,21 @@ module clk_div_100_clk (
     output reg o_clk
 );
 
-    parameter FCOUNT = 1_000_000; // FPGA 100MHz 기준 100Hz 클럭 생성
+    parameter FCOUNT = 1_000_000; // 100Hz 클럭 생성
 
     reg [$clog2(FCOUNT)-1:0] count_reg;
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             count_reg <= 0;
-            o_clk <= 0;  // ✅ 클럭 초기화
+            o_clk <= 0;  
         end else begin
-            if (count_reg == FCOUNT - 1) begin // ✅ FCOUNT마다 펄스 발생
+            if (count_reg == FCOUNT - 1) begin 
                 count_reg <= 0;
-                o_clk <= 1; // ✅ 단발성 펄스 유지
+                o_clk <= 1; 
             end else begin
                 count_reg <= count_reg + 1;
-                o_clk <= 0; // ✅ 기본 상태는 0 유지
+                o_clk <= 0;
             end
         end
     end
