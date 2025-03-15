@@ -147,7 +147,7 @@ module led_indicator (
     end
 end
 
-endmodule  // ✅ end 추가
+endmodule  
 
 
 
