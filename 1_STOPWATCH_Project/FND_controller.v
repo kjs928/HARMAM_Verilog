@@ -260,7 +260,7 @@ module dot_enable (
     input clk, reset, 
     output reg o_dot  
 );
-    reg [25:0] count;  /
+    reg [25:0] count;  //
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
